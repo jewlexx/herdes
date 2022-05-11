@@ -1,7 +1,4 @@
-use bevy::math::const_vec2;
-use bevy::prelude::*;
-
-use bevy::DefaultPlugins;
+use bevy::{math::const_vec2, prelude::*, DefaultPlugins};
 
 enum DirectionEnum {
     Up,
