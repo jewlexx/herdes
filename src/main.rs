@@ -1,7 +1,7 @@
-use bevy::{prelude::*, DefaultPlugins};
+use bevy::math::const_vec2;
+use bevy::prelude::*;
 
-#[macro_use]
-extern crate lazy_static;
+use bevy::DefaultPlugins;
 
 enum DirectionEnum {
     Up,
@@ -17,9 +17,7 @@ enum SpriteType {
     Player,
 }
 
-lazy_static! {
-    static ref DEFAULT_SIZE: Vec2 = Vec2::new(50.0, 50.0);
-}
+const DEFAULT_SIZE: Vec2 = const_vec2!([50.0, 50.0]);
 
 #[derive(Component, Default)]
 struct Direction {
@@ -42,7 +40,7 @@ fn setup(mut commands: Commands) {
         .spawn_bundle(SpriteBundle {
             sprite: Sprite {
                 color: Color::RED,
-                custom_size: Some(*DEFAULT_SIZE),
+                custom_size: Some(DEFAULT_SIZE),
                 ..default()
             },
             transform: offset_x(150.),
@@ -54,7 +52,7 @@ fn setup(mut commands: Commands) {
     commands
         .spawn_bundle(SpriteBundle {
             sprite: Sprite {
-                custom_size: Some(*DEFAULT_SIZE),
+                custom_size: Some(DEFAULT_SIZE),
                 ..default()
             },
             transform: offset_x(50.),
@@ -66,7 +64,7 @@ fn setup(mut commands: Commands) {
     commands
         .spawn_bundle(SpriteBundle {
             sprite: Sprite {
-                custom_size: Some(*DEFAULT_SIZE),
+                custom_size: Some(DEFAULT_SIZE),
                 ..default()
             },
             transform: offset_x(-50.),
@@ -78,7 +76,7 @@ fn setup(mut commands: Commands) {
     commands
         .spawn_bundle(SpriteBundle {
             sprite: Sprite {
-                custom_size: Some(*DEFAULT_SIZE),
+                custom_size: Some(DEFAULT_SIZE),
                 ..default()
             },
             transform: offset_x(-150.),
@@ -104,15 +102,15 @@ fn sprite_movement(
         .expect("could not find player");
 
     let player_transform = {
-        let (mut logo, mut transform, _) = player;
+        let (mut player_dirs, mut transform, _) = player;
 
-        let translation: f32 = (if logo.directions.len() > 1 {
+        let translation: f32 = (if player_dirs.directions.len() > 1 {
             150. / 2.
         } else {
             150.
         }) * time.delta_seconds();
 
-        for direction in logo.directions.iter() {
+        for direction in player_dirs.directions.iter() {
             match direction {
                 DirectionEnum::Up => transform.translation.y += translation,
                 DirectionEnum::Down => transform.translation.y -= translation,
@@ -137,7 +135,7 @@ fn sprite_movement(
             new_direction.push(DirectionEnum::Left);
         }
 
-        logo.directions = if new_direction.is_empty() {
+        player_dirs.directions = if new_direction.is_empty() {
             vec![DirectionEnum::Static]
         } else {
             new_direction
