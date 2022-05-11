@@ -18,54 +18,47 @@ pub fn setup(mut commands: Commands) {
         .insert(Direction::default())
         .insert(Player);
 
-    commands
-        .spawn_bundle(SpriteBundle {
-            sprite: Sprite {
-                custom_size: Some(DEFAULT_SIZE),
-                ..default()
-            },
-            transform: offset_x(50.),
+    commands.spawn_bundle(SpriteBundle {
+        sprite: Sprite {
+            custom_size: Some(DEFAULT_SIZE),
             ..default()
-        })
-        .insert(Direction::default());
+        },
+        transform: offset_x(50.),
+        ..default()
+    });
 
-    commands
-        .spawn_bundle(SpriteBundle {
-            sprite: Sprite {
-                custom_size: Some(DEFAULT_SIZE),
-                ..default()
-            },
-            transform: offset_x(-50.),
+    commands.spawn_bundle(SpriteBundle {
+        sprite: Sprite {
+            custom_size: Some(DEFAULT_SIZE),
             ..default()
-        })
-        .insert(Direction::default());
+        },
+        transform: offset_x(-50.),
+        ..default()
+    });
 
-    commands
-        .spawn_bundle(SpriteBundle {
-            sprite: Sprite {
-                custom_size: Some(DEFAULT_SIZE),
-                ..default()
-            },
-            transform: offset_x(-150.),
+    commands.spawn_bundle(SpriteBundle {
+        sprite: Sprite {
+            custom_size: Some(DEFAULT_SIZE),
             ..default()
-        })
-        .insert(Direction::default());
+        },
+        transform: offset_x(-150.),
+        ..default()
+    });
 }
 
 pub fn sprite_movement(
     time: Res<Time>,
     keys: Res<Input<KeyCode>>,
-    sprite_data: Query<(&mut Direction, &mut Transform, Option<&Player>)>,
+    mut player_data: Query<(&mut Direction, &mut Transform), With<Player>>,
+    mut sprite_data: Query<&mut Transform, Without<Player>>,
 ) {
-    let mut sprites_query = sprite_data;
-
-    let player = sprites_query
+    let player: (Mut<Direction>, Mut<Transform>) = player_data
         .iter_mut()
-        .find(|(_, _, player)| player.is_some())
+        .next()
         .expect("could not find player");
 
     let player_transform = {
-        let (mut player_dirs, mut transform, _) = player;
+        let (mut player_dirs, mut transform) = player;
 
         let translation: f32 = (if player_dirs.directions.len() > 1 {
             150. / 2.
@@ -101,13 +94,7 @@ pub fn sprite_movement(
         *transform
     };
 
-    for sprite in sprites_query.iter_mut() {
-        let (_, mut transform, player) = sprite;
-
-        if player.is_some() {
-            continue;
-        }
-
+    for mut transform in sprite_data.iter_mut() {
         let distance_from = in_range(transform.as_ref(), &player_transform, 150.);
         if distance_from.0 {
             let to_move_x = distance_from.1;
