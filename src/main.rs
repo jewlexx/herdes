@@ -161,40 +161,11 @@ fn sprite_movement(
             transform.translation.x += to_move_x * time.delta_seconds();
             transform.translation.y += to_move_y * time.delta_seconds();
         }
-
-        for sprite in sprites_query.get() {
-            let (_, stransform, _) = sprite;
-
-            let touching_distance = touching(transform.as_ref(), stransform);
-
-            println!("Touching? {}", touching_distance.0);
-
-            if touching_distance.0 {
-                let to_move_x = touching_distance.1;
-                let to_move_y = touching_distance.2;
-
-                transform.translation.x += to_move_x * time.delta_seconds();
-                transform.translation.y += to_move_y * time.delta_seconds();
-            }
-        }
     }
 }
 
 fn offset_x(x: f32) -> Transform {
     Transform::from_xyz(x, 0., 0.)
-}
-
-fn touching(a: &Transform, b: &Transform) -> (bool, f32, f32) {
-    let a_x = a.translation.x;
-    let a_y = a.translation.y;
-    let b_x = b.translation.x;
-    let b_y = b.translation.y;
-
-    let x_dist = a_x - b_x;
-    let y_dist = a_y - b_y;
-    let distance = (x_dist.powi(2) + y_dist.powi(2)).sqrt();
-
-    (distance < 50., x_dist, y_dist)
 }
 
 fn in_range(a: &Transform, b: &Transform, range: f32) -> (bool, f32, f32) {
