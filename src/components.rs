@@ -29,3 +29,6 @@ pub struct Direction {
 
 #[derive(Component)]
 pub struct Player;
+
+#[derive(Component)]
+pub struct Camera;

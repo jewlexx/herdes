@@ -1,9 +1,11 @@
 use bevy::prelude::*;
 
-use crate::components::{Direction, DirectionEnum, Player, DEFAULT_SIZE};
+use crate::components::{Camera, Direction, DirectionEnum, Player, DEFAULT_SIZE};
 
 pub fn setup(mut commands: Commands) {
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+    commands
+        .spawn_bundle(OrthographicCameraBundle::new_2d())
+        .insert(Camera);
 
     commands
         .spawn_bundle(SpriteBundle {
@@ -50,7 +52,7 @@ pub fn sprite_movement(
     time: Res<Time>,
     keys: Res<Input<KeyCode>>,
     mut player_data: Query<(&mut Direction, &mut Transform), With<Player>>,
-    mut sprite_data: Query<&mut Transform, Without<Player>>,
+    mut sprite_data: Query<(&mut Transform, Option<&Camera>), Without<Player>>,
 ) {
     let player: (Mut<Direction>, Mut<Transform>) = player_data
         .iter_mut()
@@ -94,8 +96,15 @@ pub fn sprite_movement(
         *transform
     };
 
-    for mut transform in sprite_data.iter_mut() {
+    for (i, (mut transform, cam)) in sprite_data.iter_mut().enumerate() {
+        if cam.is_some() {
+            continue;
+        }
+
+        println!("{}", i);
+
         let distance_from = in_range(transform.as_ref(), &player_transform, 150.);
+
         if distance_from.0 {
             let to_move_x = distance_from.1;
             let to_move_y = distance_from.2;
