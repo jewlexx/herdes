@@ -1,5 +1,8 @@
 use bevy::{prelude::*, DefaultPlugins};
 
+#[macro_use]
+extern crate lazy_static;
+
 enum DirectionEnum {
     Up,
     Down,
@@ -12,6 +15,10 @@ enum DirectionEnum {
 enum SpriteType {
     Person,
     Player,
+}
+
+lazy_static! {
+    static ref DEFAULT_SIZE: Vec2 = Vec2::new(50.0, 50.0);
 }
 
 #[derive(Component, Default)]
@@ -35,7 +42,7 @@ fn setup(mut commands: Commands) {
         .spawn_bundle(SpriteBundle {
             sprite: Sprite {
                 color: Color::RED,
-                custom_size: Some(Vec2::new(50.0, 50.0)),
+                custom_size: Some(*DEFAULT_SIZE),
                 ..default()
             },
             transform: offset_x(150.),
@@ -47,7 +54,7 @@ fn setup(mut commands: Commands) {
     commands
         .spawn_bundle(SpriteBundle {
             sprite: Sprite {
-                custom_size: Some(Vec2::new(50.0, 50.0)),
+                custom_size: Some(*DEFAULT_SIZE),
                 ..default()
             },
             transform: offset_x(50.),
@@ -59,7 +66,7 @@ fn setup(mut commands: Commands) {
     commands
         .spawn_bundle(SpriteBundle {
             sprite: Sprite {
-                custom_size: Some(Vec2::new(50.0, 50.0)),
+                custom_size: Some(*DEFAULT_SIZE),
                 ..default()
             },
             transform: offset_x(-50.),
@@ -71,7 +78,7 @@ fn setup(mut commands: Commands) {
     commands
         .spawn_bundle(SpriteBundle {
             sprite: Sprite {
-                custom_size: Some(Vec2::new(50.0, 50.0)),
+                custom_size: Some(*DEFAULT_SIZE),
                 ..default()
             },
             transform: offset_x(-150.),
@@ -84,11 +91,12 @@ fn setup(mut commands: Commands) {
 fn sprite_movement(
     time: Res<Time>,
     keys: Res<Input<KeyCode>>,
-    mut sprite_data: Query<(&mut Direction, &mut Transform, &SpriteType)>,
+    sprite_data: Query<(&mut Direction, &mut Transform, &SpriteType)>,
 ) {
-    let mut sprites_query = sprite_data.iter_mut();
+    let mut sprites_query = sprite_data;
 
     let player = sprites_query
+        .iter_mut()
         .find(|(_, _, sprite_type)| {
             let t = **sprite_type;
             t == SpriteType::Player
@@ -138,20 +146,36 @@ fn sprite_movement(
         *transform
     };
 
-    for sprite in sprites_query {
+    for sprite in sprites_query.iter_mut() {
         let (_, mut transform, sprite_type) = sprite;
 
         if *sprite_type == SpriteType::Player {
             continue;
         }
 
-        let distance_from = in_range(*transform, player_transform, 150.);
+        let distance_from = in_range(transform.as_ref(), &player_transform, 150.);
         if distance_from.0 {
             let to_move_x = distance_from.1;
             let to_move_y = distance_from.2;
 
             transform.translation.x += to_move_x * time.delta_seconds();
             transform.translation.y += to_move_y * time.delta_seconds();
+        }
+
+        for sprite in sprites_query.get() {
+            let (_, stransform, _) = sprite;
+
+            let touching_distance = touching(transform.as_ref(), stransform);
+
+            println!("Touching? {}", touching_distance.0);
+
+            if touching_distance.0 {
+                let to_move_x = touching_distance.1;
+                let to_move_y = touching_distance.2;
+
+                transform.translation.x += to_move_x * time.delta_seconds();
+                transform.translation.y += to_move_y * time.delta_seconds();
+            }
         }
     }
 }
@@ -160,7 +184,20 @@ fn offset_x(x: f32) -> Transform {
     Transform::from_xyz(x, 0., 0.)
 }
 
-fn in_range(a: Transform, b: Transform, range: f32) -> (bool, f32, f32) {
+fn touching(a: &Transform, b: &Transform) -> (bool, f32, f32) {
+    let a_x = a.translation.x;
+    let a_y = a.translation.y;
+    let b_x = b.translation.x;
+    let b_y = b.translation.y;
+
+    let x_dist = a_x - b_x;
+    let y_dist = a_y - b_y;
+    let distance = (x_dist.powi(2) + y_dist.powi(2)).sqrt();
+
+    (distance < 50., x_dist, y_dist)
+}
+
+fn in_range(a: &Transform, b: &Transform, range: f32) -> (bool, f32, f32) {
     let a_x = a.translation.x;
     let a_y = a.translation.y;
     let b_x = b.translation.x;
