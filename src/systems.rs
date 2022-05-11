@@ -85,18 +85,12 @@ pub fn sprite_movement(
 
         let mut new_direction: Vec<DirectionEnum> = Vec::new();
 
-        if keys.pressed(KeyCode::Up) {
-            new_direction.push(DirectionEnum::Up);
-        }
-        if keys.pressed(KeyCode::Down) {
-            new_direction.push(DirectionEnum::Down);
-        }
-        if keys.pressed(KeyCode::Right) {
-            new_direction.push(DirectionEnum::Right);
-        }
-        if keys.pressed(KeyCode::Left) {
-            new_direction.push(DirectionEnum::Left);
-        }
+        let mut dirs: Vec<DirectionEnum> = keys
+            .get_pressed()
+            .filter_map(DirectionEnum::from_code)
+            .collect();
+
+        new_direction.append(&mut dirs);
 
         player_dirs.directions = if new_direction.is_empty() {
             vec![DirectionEnum::Static]
