@@ -59,7 +59,7 @@ pub fn sprite_movement(
     time: Res<Time>,
     keys: Res<Input<KeyCode>>,
     mut player_data: Query<(&mut Direction, &mut Transform), With<Player>>,
-    mut sprite_data: Query<(&mut Transform, Option<&Camera>), Without<Player>>,
+    mut sprite_data: Query<(&mut Transform, Option<&Camera>, Option<&mut Npc>), Without<Player>>,
 ) {
     let player: (Mut<Direction>, Mut<Transform>) = player_data
         .iter_mut()
@@ -103,38 +103,47 @@ pub fn sprite_movement(
         *transform
     };
 
-    for (mut transform, cam) in sprite_data.iter_mut() {
+    for (mut transform, cam, npc_opt) in sprite_data.iter_mut() {
         if cam.is_some() {
             continue;
         }
 
-        let mut rng = rand::thread_rng();
-        // This allows me to rig the rand gen in favour of the previous direction
-        let opts = vec![
-            DirectionEnum::Left,
-            DirectionEnum::Right,
-            DirectionEnum::Up,
-            DirectionEnum::Down,
-            DirectionEnum::Static,
-        ];
-        let direction_index = rng.gen_range(0..opts.len());
-        let direction = opts.get(direction_index).unwrap();
+        if let Some(mut npc) = npc_opt {
+            let mut rng = rand::thread_rng();
+            // This allows me to rig the rand gen in favour of the previous direction
+            let mut opts = vec![
+                DirectionEnum::Left,
+                DirectionEnum::Right,
+                DirectionEnum::Up,
+                DirectionEnum::Down,
+                DirectionEnum::Static,
+            ];
 
-        match direction {
-            DirectionEnum::Up => {
-                transform.translation.y += 150. * time.delta_seconds();
+            for _ in 0..25 {
+                opts.push(npc.previous_direction);
             }
-            DirectionEnum::Left => {
-                transform.translation.x -= 150. * time.delta_seconds();
-            }
-            DirectionEnum::Down => {
-                transform.translation.y -= 150. * time.delta_seconds();
-            }
-            DirectionEnum::Right => {
-                transform.translation.x += 150. * time.delta_seconds();
-            }
-            DirectionEnum::Static => {}
-        };
+
+            let direction_index = rng.gen_range(0..opts.len());
+            let direction = opts.get(direction_index).unwrap();
+
+            npc.previous_direction = *direction;
+
+            match direction {
+                DirectionEnum::Up => {
+                    transform.translation.y += 150. * time.delta_seconds();
+                }
+                DirectionEnum::Left => {
+                    transform.translation.x -= 150. * time.delta_seconds();
+                }
+                DirectionEnum::Down => {
+                    transform.translation.y -= 150. * time.delta_seconds();
+                }
+                DirectionEnum::Right => {
+                    transform.translation.x += 150. * time.delta_seconds();
+                }
+                DirectionEnum::Static => {}
+            };
+        }
 
         let distance_from = in_range(transform.as_ref(), &player_transform, 150.);
 
