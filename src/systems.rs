@@ -105,7 +105,7 @@ pub fn sprite_movement(
         let mut rng = rand::thread_rng();
         let direction_num: u8 = rng.gen_range(0..=3);
 
-        let direction = match direction_num {
+        match direction_num {
             0 => {
                 transform.translation.y += 150. * time.delta_seconds();
             }
