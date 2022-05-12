@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use rand::Rng;
 
-use crate::components::{Camera, Direction, DirectionEnum, Player, DEFAULT_SIZE};
+use crate::components::{Camera, Direction, DirectionEnum, Npc, Player, DEFAULT_SIZE};
 
 pub fn setup(mut commands: Commands) {
     commands
@@ -21,32 +21,38 @@ pub fn setup(mut commands: Commands) {
         .insert(Direction::default())
         .insert(Player);
 
-    commands.spawn_bundle(SpriteBundle {
-        sprite: Sprite {
-            custom_size: Some(DEFAULT_SIZE),
+    commands
+        .spawn_bundle(SpriteBundle {
+            sprite: Sprite {
+                custom_size: Some(DEFAULT_SIZE),
+                ..default()
+            },
+            transform: offset_x(50.),
             ..default()
-        },
-        transform: offset_x(50.),
-        ..default()
-    });
+        })
+        .insert(Npc::default());
 
-    commands.spawn_bundle(SpriteBundle {
-        sprite: Sprite {
-            custom_size: Some(DEFAULT_SIZE),
+    commands
+        .spawn_bundle(SpriteBundle {
+            sprite: Sprite {
+                custom_size: Some(DEFAULT_SIZE),
+                ..default()
+            },
+            transform: offset_x(-50.),
             ..default()
-        },
-        transform: offset_x(-50.),
-        ..default()
-    });
+        })
+        .insert(Npc::default());
 
-    commands.spawn_bundle(SpriteBundle {
-        sprite: Sprite {
-            custom_size: Some(DEFAULT_SIZE),
+    commands
+        .spawn_bundle(SpriteBundle {
+            sprite: Sprite {
+                custom_size: Some(DEFAULT_SIZE),
+                ..default()
+            },
+            transform: offset_x(-150.),
             ..default()
-        },
-        transform: offset_x(-150.),
-        ..default()
-    });
+        })
+        .insert(Npc::default());
 }
 
 pub fn sprite_movement(
