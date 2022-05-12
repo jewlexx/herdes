@@ -55,6 +55,13 @@ pub fn setup(mut commands: Commands) {
         .insert(Npc::default());
 }
 
+enum Axis {
+    XPos,
+    XNeg,
+    YPos,
+    YNeg,
+}
+
 pub fn sprite_movement(
     time: Res<Time>,
     keys: Res<Input<KeyCode>>,
@@ -82,32 +89,28 @@ pub fn sprite_movement(
         }) * time.delta_seconds();
 
         for direction in player_dirs.directions.iter() {
-            match direction {
-                DirectionEnum::Up => {
-                    let to_be = transform.translation.y + translation;
-                    if to_be < height / 2. {
-                        transform.translation.y = to_be;
-                    }
-                }
-                DirectionEnum::Down => {
-                    let to_be = transform.translation.y - translation;
-                    if to_be > -height / 2. {
-                        transform.translation.y = to_be;
-                    }
-                }
-                DirectionEnum::Right => {
-                    let to_be = transform.translation.x + translation;
-                    if to_be < width / 2. {
-                        transform.translation.x = to_be;
-                    }
-                }
-                DirectionEnum::Left => {
-                    let to_be = transform.translation.x - translation;
-                    if to_be > -width / 2. {
-                        transform.translation.x = to_be;
-                    }
-                }
-                _ => {}
+            let (axis, amount) = match direction {
+                DirectionEnum::Up => (Axis::YPos, transform.translation.y + translation),
+                DirectionEnum::Down => (Axis::YNeg, transform.translation.y - translation),
+                DirectionEnum::Right => (Axis::XPos, transform.translation.x + translation),
+                DirectionEnum::Left => (Axis::XNeg, transform.translation.x - translation),
+                _ => (Axis::XNeg, 0.),
+            };
+
+            let is_ok = match axis {
+                Axis::XPos => amount < width / 2.,
+                Axis::XNeg => amount > -width / 2.,
+                Axis::YPos => amount < height / 2.,
+                Axis::YNeg => amount > -height / 2.,
+            };
+
+            if is_ok {
+                match axis {
+                    Axis::XPos => transform.translation.x += translation,
+                    Axis::XNeg => transform.translation.x -= translation,
+                    Axis::YPos => transform.translation.y += translation,
+                    Axis::YNeg => transform.translation.y -= translation,
+                };
             }
         }
 
