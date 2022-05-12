@@ -1,11 +1,18 @@
 use bevy::{math::const_vec2, prelude::*};
 
+#[derive(Clone, Copy)]
 pub enum DirectionEnum {
     Up,
     Down,
     Right,
     Left,
     Static,
+}
+
+impl Default for DirectionEnum {
+    fn default() -> Self {
+        DirectionEnum::Static
+    }
 }
 
 impl DirectionEnum {
@@ -18,6 +25,11 @@ impl DirectionEnum {
             _ => None,
         }
     }
+}
+
+#[derive(Component, Clone, Copy, Default)]
+pub struct Npc {
+    pub previous_direction: DirectionEnum,
 }
 
 pub const DEFAULT_SIZE: Vec2 = const_vec2!([50.0, 50.0]);
