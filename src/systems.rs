@@ -96,12 +96,10 @@ pub fn sprite_movement(
         *transform
     };
 
-    for (i, (mut transform, cam)) in sprite_data.iter_mut().enumerate() {
+    for (mut transform, cam) in sprite_data.iter_mut() {
         if cam.is_some() {
             continue;
         }
-
-        println!("{}", i);
 
         let distance_from = in_range(transform.as_ref(), &player_transform, 150.);
 
