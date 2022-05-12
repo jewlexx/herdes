@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use rand::Rng;
 
 use crate::components::{Camera, Direction, DirectionEnum, Player, DEFAULT_SIZE};
 
@@ -100,6 +101,25 @@ pub fn sprite_movement(
         if cam.is_some() {
             continue;
         }
+
+        let mut rng = rand::thread_rng();
+        let direction_num: u8 = rng.gen_range(0..=3);
+
+        let direction = match direction_num {
+            0 => {
+                transform.translation.y += 150. * time.delta_seconds();
+            }
+            1 => {
+                transform.translation.x -= 150. * time.delta_seconds();
+            }
+            2 => {
+                transform.translation.y -= 150. * time.delta_seconds();
+            }
+            3 => {
+                transform.translation.x += 150. * time.delta_seconds();
+            }
+            _ => {}
+        };
 
         let distance_from = in_range(transform.as_ref(), &player_transform, 150.);
 
