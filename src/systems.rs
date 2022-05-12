@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use rand::Rng;
 
-use crate::components::{Camera, Direction, DirectionEnum, Npc, Player, DEFAULT_SIZE};
+use crate::components::{Camera, DirectionEnum, Npc, Player, DEFAULT_SIZE};
 
 // pub fn window_setup() {}
 
@@ -16,13 +16,12 @@ pub fn setup(mut commands: Commands) {
                 custom_size: Some(DEFAULT_SIZE),
                 ..default()
             },
-            transform: offset_x(50.),
             ..default()
         },
         Npc::default(),
     );
 
-    let sprites = vec![sprite; 10];
+    let sprites = vec![sprite; 100];
 
     for (bundle, npc) in sprites {
         commands.spawn_bundle(bundle).insert(npc);
@@ -40,73 +39,12 @@ pub fn sprite_movement(
     time: Res<Time>,
     keys: Res<Input<KeyCode>>,
     windows: Res<Windows>,
-    mut player_data: Query<(&mut Direction, &mut Transform), With<Player>>,
     mut sprite_data: Query<(&mut Transform, Option<&Camera>, Option<&mut Npc>), Without<Player>>,
 ) {
     let win = windows.get_primary().unwrap();
 
     let width = win.width();
     let height = win.height();
-
-    let player: (Mut<Direction>, Mut<Transform>) = player_data
-        .iter_mut()
-        .next()
-        .expect("could not find player");
-
-    let player_transform = {
-        let (mut player_dirs, mut transform) = player;
-
-        let translation: f32 = (if player_dirs.directions.len() > 1 {
-            150. / 2.
-        } else {
-            150.
-        }) * time.delta_seconds();
-
-        for direction in player_dirs.directions.iter() {
-            let (axis, amount) = match direction {
-                DirectionEnum::Up => (Axis::YPos, transform.translation.y + translation),
-                DirectionEnum::Down => (Axis::YNeg, transform.translation.y - translation),
-                DirectionEnum::Right => (Axis::XPos, transform.translation.x + translation),
-                DirectionEnum::Left => (Axis::XNeg, transform.translation.x - translation),
-                _ => {
-                    continue;
-                }
-            };
-
-            let is_ok = match axis {
-                Axis::XPos => amount < width / 2.,
-                Axis::XNeg => amount > -width / 2.,
-                Axis::YPos => amount < height / 2.,
-                Axis::YNeg => amount > -height / 2.,
-            };
-
-            if is_ok {
-                match axis {
-                    Axis::XPos => transform.translation.x += translation,
-                    Axis::XNeg => transform.translation.x -= translation,
-                    Axis::YPos => transform.translation.y += translation,
-                    Axis::YNeg => transform.translation.y -= translation,
-                };
-            }
-        }
-
-        let mut new_direction: Vec<DirectionEnum> = Vec::new();
-
-        let mut dirs: Vec<DirectionEnum> = keys
-            .get_pressed()
-            .filter_map(DirectionEnum::from_code)
-            .collect();
-
-        new_direction.append(&mut dirs);
-
-        player_dirs.directions = if new_direction.is_empty() {
-            vec![DirectionEnum::Static]
-        } else {
-            new_direction
-        };
-
-        *transform
-    };
 
     for (mut transform, cam, npc_opt) in sprite_data.iter_mut() {
         if cam.is_some() {
@@ -150,15 +88,15 @@ pub fn sprite_movement(
             };
         }
 
-        let distance_from = in_range(transform.as_ref(), &player_transform, 150.);
+        // let distance_from = in_range(transform.as_ref(), &player_transform, 150.);
 
-        if distance_from.0 {
-            let to_move_x = distance_from.1;
-            let to_move_y = distance_from.2;
+        // if distance_from.0 {
+        //     let to_move_x = distance_from.1;
+        //     let to_move_y = distance_from.2;
 
-            transform.translation.x += to_move_x * time.delta_seconds();
-            transform.translation.y += to_move_y * time.delta_seconds();
-        }
+        //     transform.translation.x += to_move_x * time.delta_seconds();
+        //     transform.translation.y += to_move_y * time.delta_seconds();
+        // }
     }
 }
 

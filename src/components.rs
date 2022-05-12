@@ -32,7 +32,7 @@ pub struct Npc {
     pub previous_direction: DirectionEnum,
 }
 
-pub const DEFAULT_SIZE: Vec2 = const_vec2!([50.0, 50.0]);
+pub const DEFAULT_SIZE: Vec2 = const_vec2!([5.0, 5.0]);
 
 #[derive(Component, Default)]
 pub struct Direction {
