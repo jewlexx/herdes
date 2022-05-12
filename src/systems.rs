@@ -94,7 +94,9 @@ pub fn sprite_movement(
                 DirectionEnum::Down => (Axis::YNeg, transform.translation.y - translation),
                 DirectionEnum::Right => (Axis::XPos, transform.translation.x + translation),
                 DirectionEnum::Left => (Axis::XNeg, transform.translation.x - translation),
-                _ => (Axis::XNeg, 0.),
+                _ => {
+                    continue;
+                }
             };
 
             let is_ok = match axis {
