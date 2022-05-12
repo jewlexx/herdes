@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, window::Window};
 use rand::Rng;
 
 use crate::components::{Camera, Direction, DirectionEnum, Npc, Player, DEFAULT_SIZE};
@@ -58,9 +58,15 @@ pub fn setup(mut commands: Commands) {
 pub fn sprite_movement(
     time: Res<Time>,
     keys: Res<Input<KeyCode>>,
+    windows: Res<Windows>,
     mut player_data: Query<(&mut Direction, &mut Transform), With<Player>>,
     mut sprite_data: Query<(&mut Transform, Option<&Camera>, Option<&mut Npc>), Without<Player>>,
 ) {
+    let win = windows.get_primary().unwrap();
+
+    let width = win.width();
+    let height = win.height();
+
     let player: (Mut<Direction>, Mut<Transform>) = player_data
         .iter_mut()
         .next()
@@ -77,10 +83,30 @@ pub fn sprite_movement(
 
         for direction in player_dirs.directions.iter() {
             match direction {
-                DirectionEnum::Up => transform.translation.y += translation,
-                DirectionEnum::Down => transform.translation.y -= translation,
-                DirectionEnum::Right => transform.translation.x += translation,
-                DirectionEnum::Left => transform.translation.x -= translation,
+                DirectionEnum::Up => {
+                    let to_be = transform.translation.y + translation;
+                    if to_be < height / 2. {
+                        transform.translation.y = to_be;
+                    }
+                }
+                DirectionEnum::Down => {
+                    let to_be = transform.translation.y - translation;
+                    if to_be > -height / 2. {
+                        transform.translation.y = to_be;
+                    }
+                }
+                DirectionEnum::Right => {
+                    let to_be = transform.translation.x + translation;
+                    if to_be < width / 2. {
+                        transform.translation.x = to_be;
+                    }
+                }
+                DirectionEnum::Left => {
+                    let to_be = transform.translation.x - translation;
+                    if to_be > -width / 2. {
+                        transform.translation.x = to_be;
+                    }
+                }
                 _ => {}
             }
         }
