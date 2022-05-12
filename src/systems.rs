@@ -127,7 +127,7 @@ pub fn sprite_movement(
             DirectionEnum::Right => {
                 transform.translation.x += 150. * time.delta_seconds();
             }
-            _ => {}
+            DirectionEnum::Static => {}
         };
 
         let distance_from = in_range(transform.as_ref(), &player_transform, 150.);
