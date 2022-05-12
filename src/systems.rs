@@ -10,51 +10,23 @@ pub fn setup(mut commands: Commands) {
         .spawn_bundle(OrthographicCameraBundle::new_2d())
         .insert(Camera);
 
-    commands
-        .spawn_bundle(SpriteBundle {
-            sprite: Sprite {
-                color: Color::RED,
-                custom_size: Some(DEFAULT_SIZE),
-                ..default()
-            },
-            transform: offset_x(150.),
-            ..default()
-        })
-        .insert(Direction::default())
-        .insert(Player);
-
-    commands
-        .spawn_bundle(SpriteBundle {
+    let sprite = (
+        SpriteBundle {
             sprite: Sprite {
                 custom_size: Some(DEFAULT_SIZE),
                 ..default()
             },
             transform: offset_x(50.),
             ..default()
-        })
-        .insert(Npc::default());
+        },
+        Npc::default(),
+    );
 
-    commands
-        .spawn_bundle(SpriteBundle {
-            sprite: Sprite {
-                custom_size: Some(DEFAULT_SIZE),
-                ..default()
-            },
-            transform: offset_x(-50.),
-            ..default()
-        })
-        .insert(Npc::default());
+    let sprites = vec![sprite; 10];
 
-    commands
-        .spawn_bundle(SpriteBundle {
-            sprite: Sprite {
-                custom_size: Some(DEFAULT_SIZE),
-                ..default()
-            },
-            transform: offset_x(-150.),
-            ..default()
-        })
-        .insert(Npc::default());
+    for (bundle, npc) in sprites {
+        commands.spawn_bundle(bundle).insert(npc);
+    }
 }
 
 enum Axis {
