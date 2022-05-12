@@ -111,7 +111,7 @@ pub fn sprite_movement(
             DirectionEnum::Down,
             DirectionEnum::Static,
         ];
-        let direction_index = rng.gen_range(0..=opts.len());
+        let direction_index = rng.gen_range(0..opts.len());
         let direction = opts.get(direction_index).unwrap();
 
         match direction {
