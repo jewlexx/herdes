@@ -12,12 +12,15 @@ mod config;
 mod errors;
 mod systems;
 
+use config::Config;
+
 fn main() {
+    let config = Config::init().unwrap();
     App::new()
         .insert_resource(WindowDescriptor {
             title: "Herd Simulation".to_string(),
             present_mode: PresentMode::Fifo,
-            mode: WindowMode::Fullscreen,
+            mode: WindowMode::Windowed,
             ..default()
         })
         .add_plugins(DefaultPlugins)

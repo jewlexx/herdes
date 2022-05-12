@@ -20,6 +20,10 @@ impl Config {
     pub fn init() -> Result<Self, ConfigError> {
         let config_path = CONFIG_PATH.to_owned();
 
+        if !(CONFIG_DIR.to_owned()).exists() {
+            std::fs::create_dir_all(CONFIG_DIR.to_owned())?;
+        }
+
         let config = {
             if config_path.exists() {
                 let file = std::fs::File::open(&config_path)?;

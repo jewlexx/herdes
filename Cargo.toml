@@ -12,4 +12,5 @@ lazy_static = "1.4.0"
 rand = "0.8.5"
 serde = { version = "1.0.137", features = ["derive"] }
 serde_json = "1.0.81"
+strum = { version = "0.24.0", features = ["derive"] }
 thiserror = "1.0.31"

@@ -1,3 +1,7 @@
+use strum::Display;
+use thiserror::Error;
+
+#[derive(Debug, Error, Display)]
 pub enum ConfigError {
     IoError(std::io::Error),
     JsonError(serde_json::Error),
