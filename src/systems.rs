@@ -103,19 +103,27 @@ pub fn sprite_movement(
         }
 
         let mut rng = rand::thread_rng();
-        let direction_num: u8 = rng.gen_range(0..=3);
+        // This allows me to rig the rand gen in favour of the previous direction
+        let opts = vec![
+            DirectionEnum::Left,
+            DirectionEnum::Right,
+            DirectionEnum::Up,
+            DirectionEnum::Down,
+        ];
+        let direction_index = rng.gen_range(0..=opts.len());
+        let direction = opts.get(direction_index).unwrap();
 
-        match direction_num {
-            0 => {
+        match direction {
+            DirectionEnum::Up => {
                 transform.translation.y += 150. * time.delta_seconds();
             }
-            1 => {
+            DirectionEnum::Left => {
                 transform.translation.x -= 150. * time.delta_seconds();
             }
-            2 => {
+            DirectionEnum::Down => {
                 transform.translation.y -= 150. * time.delta_seconds();
             }
-            3 => {
+            DirectionEnum::Right => {
                 transform.translation.x += 150. * time.delta_seconds();
             }
             _ => {}
