@@ -1,7 +1,9 @@
-use bevy::{prelude::*, window::Window};
+use bevy::prelude::*;
 use rand::Rng;
 
 use crate::components::{Camera, Direction, DirectionEnum, Npc, Player, DEFAULT_SIZE};
+
+// pub fn window_setup() {}
 
 pub fn setup(mut commands: Commands) {
     commands
